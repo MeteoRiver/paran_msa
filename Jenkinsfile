@@ -11,7 +11,7 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    def modules = ['gateway-server', 'config-server', 'eureka-server', 'chat-service', 'comment-service', 'file-service', 'group-serivce', 'room-service', 'user-service'] // 모듈 이름으로 리스트를 수정하세요
+                    def modules = ['gateway-server', 'config-server', 'eureka-server', 'chat-service', 'comment-service', 'file-service', 'group-service', 'room-service', 'user-service'] // 모듈 이름으로 리스트를 수정하세요
                     
                     for (module in modules) {
                         dir(module) {
@@ -26,7 +26,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 // 배포 스크립트 실행
-                sh 'docker-compose up'
+                sh 'docker-compose up -d'
             }
         }
     }
