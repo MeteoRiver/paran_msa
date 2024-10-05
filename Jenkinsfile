@@ -59,7 +59,11 @@ pipeline {
         
                         // 각 서비스에 대해 Docker Hub에 푸시
                         for (module in modules) {
-                            sh "docker push meteoriver/${module}:${env.BUILD_ID}"
+                            // Docker 이미지 빌드
+                            def image = docker.build("meteoriver/${module}:${env.BUILD_ID}")
+                            
+                            // 이미지 푸시
+                            image.push("${env.BUILD_ID}")
                         }
                     }
                 }
