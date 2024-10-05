@@ -48,8 +48,7 @@ pipeline {
         
                     for (module in modules) {
                         // Docker 이미지 빌드
-                        def image = docker.build("meteoriver/${module}:${env.BUILD_ID}", "./${module}/Dockerfile")
-                        // 이미지 푸시
+                        def image = docker.build("meteoriver/${module}:${env.BUILD_ID}", "./${module}")  // ./gateway-server                        // 이미지 푸시
                         image.push("${env.BUILD_ID}")
                     }
                 }
