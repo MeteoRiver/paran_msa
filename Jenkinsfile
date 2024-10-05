@@ -12,21 +12,12 @@ pipeline {
             steps {
                 script {
                     def modules = ['gateway-server', 'config-server', 'eureka-server', 'chat-service', 'comment-service', 'file-service', 'group-service', 'room-service', 'user-service'] // 모듈 이름으로 리스트를 수정하세요
+                    
                     for (module in modules) {
                         dir(module) {
-                            // 현재 디렉토리의 파일 목록 출력 (디버깅용)
-                            sh 'ls -la'
-                            
-                            // Gradle Wrapper가 있는지 확인하고 실행
-                            if (fileExists('gradlew')) {
-                                sh 'chmod +x ./gradlew'
-                                sh './gradlew clean'
-                                sh './gradlew build'
-                            } else {
-                                // Gradle Wrapper가 없을 경우 Gradle을 사용
-                                sh 'gradle clean'
-                                sh 'gradle build'
-                            }
+                            // Gradle Wrapper를 사용하여 clean 및 build 수행
+                            sh './gradlew clean'
+                            sh './gradlew build'
                         }
                     }
                 }
