@@ -39,11 +39,20 @@ pipeline {
                 }
             }
         }
-
         stage('Build Docker Images') {
             steps {
-                // Docker Compose 이미지 생성
-                sh 'docker-compose build'
+                script {
+                    def modules = ["gateway-server", "config-server", "eureka-server", 
+                                   "user-service", "group-service", "chat-service", 
+                                   "file-service", "room-service", "comment-service"]
+        
+                    for (module in modules) {
+                        // Docker 이미지 빌드
+                        def image = docker.build("meteoriver/${module}:${env.BUILD_ID}", "./${module}/Dockerfile")
+                        // 이미지 푸시
+                        image.push("${env.BUILD_ID}")
+                    }
+                }
             }
         }
 
