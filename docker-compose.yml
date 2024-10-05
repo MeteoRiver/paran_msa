@@ -23,7 +23,6 @@ services:
       - paran-net
     depends_on:
       - eureka
-      - redis
     hostname: gateway
 
   config:
@@ -52,7 +51,6 @@ services:
       - paran-net
     depends_on:
       - eureka
-      - redis
     hostname: chat
 
   comment:
