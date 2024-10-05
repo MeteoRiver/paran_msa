@@ -27,10 +27,9 @@ pipeline {
                     export JAVA_HOME="$JAVA_HOME"
 
                     # 모듈 리스트
-                    all_modules=("server:api-gateway" "server:config-server" "server:eureka-server"
-                                 "service:user-service" "service:auth-service" "service:chat-service"
-                                 "service:admin-service" "service:post-service" "service:shop-service"
-                                 "service:community-service" "service:review-service")
+                    all_modules=("server:gateway-server" "server:config-server" "server:eureka-server"
+                                 "service:user-service" "service:group-service" "service:chat-service"
+                                 "service:file-service" "service:room-service" "service:comment-service" )
 
                     # Gradle clean
                     echo "Cleaning..."
