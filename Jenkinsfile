@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'BE', credentialsId: 'paran', url: 'https://github.com/MeteoRiver/paran_msa.git'
+                git branch: 'master', credentialsId: 'paran', url: 'https://github.com/MeteoRiver/paran_msa.git'
             }
         }
         
