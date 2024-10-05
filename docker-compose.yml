@@ -1,0 +1,176 @@
+services:
+  eureka:
+    build:
+      context: server/eureka-server
+      dockerfile: Dockerfile
+    image: meteoriver/eureka:latest
+    container_name: eureka
+    ports:
+      - 8761:8761
+    networks:
+      - paran-net
+    hostname: eureka
+
+  gateway:
+    build:
+      context: server/gateway-server
+      dockerfile: Dockerfile
+    image: meteoriver/gateway:latest
+    container_name: gateway
+    ports:
+      - 8000:8000
+    networks:
+      - paran-net
+    depends_on:
+      - eureka
+      - redis
+    hostname: gateway
+
+  config:
+    build:
+      context: server/config-server
+      dockerfile: Dockerfile
+    image: meteoriver/config:latest
+    container_name: config
+    ports:
+      - 8888:8888
+    networks:
+      - paran-net
+    depends_on:
+      - eureka
+    hostname: config
+
+  chat:
+    build:
+      context: service/chat-service
+      dockerfile: Dockerfile
+    image: meteoriver/chat:latest
+    container_name: chat
+    ports:
+      - 8081:8081
+    networks:
+      - paran-net
+    depends_on:
+      - eureka
+      - redis
+    hostname: chat
+
+  comment:
+    build:
+      context: service/comment-service
+      dockerfile: Dockerfile
+    image: meteoriver/comment:latest
+    container_name: comment
+    ports:
+      - 8084:8084
+    networks:
+      - paran-net
+    depends_on:
+      - eureka
+    hostname: comment
+
+  file:
+    build:
+      context: service/file-service
+      dockerfile: Dockerfile
+    image: meteoriver/file:latest
+    container_name: file
+    ports:
+      - 8090:8090
+    networks:
+      - paran-net
+    depends_on:
+      - eureka
+    hostname: file
+
+  group:
+    build:
+      context: service/group-service
+      dockerfile: Dockerfile
+    image: meteoriver/group:latest
+    container_name: group
+    ports:
+      - 8085:8085
+    networks:
+      - paran-net
+    depends_on:
+      - eureka
+    hostname: group
+
+  room:
+    build:
+      context: service/room-service
+      dockerfile: Dockerfile
+    image: meteoriver/room:latest
+    container_name: room
+    ports:
+      - 8083:8083
+    networks:
+      - paran-net
+    depends_on:
+      - eureka
+    hostname: room
+
+  user:
+    build:
+      context: service/user-service
+      dockerfile: Dockerfile
+    image: meteoriver/user:latest
+    container_name: user
+    ports:
+      - 8082:8082
+    networks:
+      - paran-net
+    depends_on:
+      - eureka
+    hostname: user
+
+  mysql:
+    container_name: mysql
+    image: meteoriver/mysql:latest
+    environment:
+      - MYSQL_DATABASE=parandb   # application.yml의 DB 이름
+      - MYSQL_ROOT_PASSWORD=1234  # application.yml에서 설정한 MySQL root 비밀번호
+      - MYSQL_ROOT_HOST=%
+    command: [ '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci' ]
+    volumes:
+      - ./mysql/demo/etc/mysql/conf.d:/etc/mysql/conf.d:ro
+      - ./mysql/demo/var/lib/mysql:/var/lib/mysql
+      - ./mysql/demo/var/log/mysql:/var/log/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - paran-net
+    restart: always
+
+  redis:
+    container_name: redis
+    image: meteoriver/redis:latest
+    command: redis-server --requirepass 1234  # Redis 비밀번호 설정
+    ports:
+      - 6379:6379
+    volumes:
+      - ./redis/data:/data  # 데이터 저장소
+    networks:
+      - paran-net
+    restart: always
+
+  mongo:
+    container_name: mongo
+    image: meteoriver/mongo:latest
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=1234
+      - MONGO_INITDB_DATABASE=parandb
+    ports:
+      - 27017:27017
+    volumes:
+      - ./mongodb:/data/db  # 데이터 영속성을 위한 볼륨
+    networks:
+      - paran-net
+    restart: always
+
+
+networks:
+  paran-net:
+    driver: bridge
