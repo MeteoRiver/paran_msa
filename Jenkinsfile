@@ -10,8 +10,16 @@ pipeline {
         
         stage('Build') {
             steps {
-                // 빌드 스크립트 실행
-                sh './gradlew build'
+                script {
+                    def modules = ['gateway-server', 'config-server', 'eureka-server', 'chat-service', 'comment-service', 'file-service', 'group-serivce', 'room-service', 'user-service'] // 모듈 이름으로 리스트를 수정하세요
+                    
+                    for (module in modules) {
+                        dir(module) {
+                            sh 'chmod +x ./gradlew'
+                            sh './gradlew clean'
+                            sh './gradlew build'
+                        }
+                }
             }
         }
         
