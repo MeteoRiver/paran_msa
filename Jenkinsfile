@@ -1,8 +1,14 @@
 pipeline {
     agent any
 
+    // 환경 설정
     environment {
-        JAVA_HOME = '/Library/Java/JavaVirtualMachines/corretto-17.0.11.jdk/Contents/Home'
+        // 사용 환경에 맞게 JAVA_HOME을 설정하세요.
+        // Docker에서 실행 중일 때
+        JAVA_HOME = '/opt/java/openjdk'  // Docker에서의 Java 경로
+        
+        // MacOS에서 실행 중일 때
+        // JAVA_HOME = '/Library/Java/JavaVirtualMachines/corretto-17.0.11.jdk/Contents/Home'
     }
 
     stages {
