@@ -39,21 +39,6 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
 
-  data:
-    redis:
-      host: redis   # Redis 서버 호스트
-      port: 6379        # Redis 서버 포트
-      username: root      # Redis 서버 사용자 이름 (필요한 경우)
-      password: password    # Redis 서버 비밀번호
-      lettuce:
-        pool:
-          max-active: 8       # 최대 활성 연결 수
-          max-idle: 8         # 최대 유휴 연결 수
-          min-idle: 0         # 최소 유휴 연결 수
-          max-wait: 10000ms   # 최대 대기 시간 (밀리초)
-
-    mongodb:
-      uri: mongodb://root:1234@mongo:27017/parandb?authSource=admin
 
   logging:
     level:
