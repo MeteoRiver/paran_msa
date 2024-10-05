@@ -1,14 +1,8 @@
 pipeline {
     agent any
 
-    // 환경 설정
     environment {
-        // 사용 환경에 맞게 JAVA_HOME을 설정하세요.
-        // Docker에서 실행 중일 때
         JAVA_HOME = '/opt/java/openjdk'  // Docker에서의 Java 경로
-        
-        // MacOS에서 실행 중일 때
-        // JAVA_HOME = '/Library/Java/JavaVirtualMachines/corretto-17.0.11.jdk/Contents/Home'
     }
 
     stages {
@@ -29,7 +23,7 @@ pipeline {
                     # 모듈 리스트
                     all_modules=("server:gateway-server" "server:config-server" "server:eureka-server"
                                  "service:user-service" "service:group-service" "service:chat-service"
-                                 "service:file-service" "service:room-service" "service:comment-service" )
+                                 "service:file-service" "service:room-service" "service:comment-service")
 
                     # Gradle clean
                     echo "Cleaning..."
@@ -46,11 +40,54 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Build Docker Images') {
             steps {
-                // Docker Compose로 배포
-                sh 'docker-compose up -d'
+                // Docker Compose 이미지 생성
+                sh 'docker-compose build'
             }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                script {
+                    // Docker Hub에 이미지 푸시
+                    docker.withRegistry('https://registry.hub.docker.com', 'paran-docker') {
+                        // 모듈 리스트
+                        def modules = ["gateway-server", "config-server", "eureka-server", 
+                                       "user-service", "group-service", "chat-service", 
+                                       "file-service", "room-service", "comment-service"]
+        
+                        // 각 서비스에 대해 Docker Hub에 푸시
+                        for (module in modules) {
+                            sh "docker push meteoriver/${module}:${env.BUILD_ID}"
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    // Kubernetes에 배포
+                    def modules = ["gateway-server", "config-server", "eureka-server", 
+                                   "user-service", "group-service", "chat-service", 
+                                   "file-service", "room-service", "comment-service"]
+        
+                    for (module in modules) {
+                        // 각 모듈의 이미지를 설정
+                        kubectl("set image deployment/${module} ${module}=meteoriver/${module}:${env.BUILD_ID}")
+                    }
+                }
+            }
+        }
+
+    post {
+        success {
+            echo 'Deployment successful!'
+        }
+        failure {
+            echo 'Deployment failed.'
         }
     }
 }
