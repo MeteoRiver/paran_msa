@@ -76,11 +76,13 @@ pipeline {
         
                     for (module in modules) {
                         // 각 모듈의 이미지를 설정
-                        kubectl("set image deployment/${module} ${module}=meteoriver/${module}:${env.BUILD_ID}")
+                        sh "kubectl set image deployment/${module} ${module}=meteoriver/${module}:${env.BUILD_ID}"
                     }
                 }
             }
         }
+
+    } // stages 종료
 
     post {
         success {
