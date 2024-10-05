@@ -125,52 +125,6 @@ services:
       - eureka
     hostname: user
 
-  mysql:
-    container_name: mysql
-    image: meteoriver/mysql:latest
-    environment:
-      - MYSQL_DATABASE=parandb   # application.yml의 DB 이름
-      - MYSQL_ROOT_PASSWORD=1234  # application.yml에서 설정한 MySQL root 비밀번호
-      - MYSQL_ROOT_HOST=%
-    command: [ '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci' ]
-    volumes:
-      - ./mysql/demo/etc/mysql/conf.d:/etc/mysql/conf.d:ro
-      - ./mysql/demo/var/lib/mysql:/var/lib/mysql
-      - ./mysql/demo/var/log/mysql:/var/log/mysql
-    ports:
-      - "3306:3306"
-    networks:
-      - paran-net
-    restart: always
-
-  redis:
-    container_name: redis
-    image: meteoriver/redis:latest
-    command: redis-server --requirepass 1234  # Redis 비밀번호 설정
-    ports:
-      - 6379:6379
-    volumes:
-      - ./redis/data:/data  # 데이터 저장소
-    networks:
-      - paran-net
-    restart: always
-
-  mongo:
-    container_name: mongo
-    image: meteoriver/mongo:latest
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=1234
-      - MONGO_INITDB_DATABASE=parandb
-    ports:
-      - 27017:27017
-    volumes:
-      - ./mongodb:/data/db  # 데이터 영속성을 위한 볼륨
-    networks:
-      - paran-net
-    restart: always
-
-
 networks:
   paran-net:
     driver: bridge
