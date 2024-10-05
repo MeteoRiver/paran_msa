@@ -10,15 +10,15 @@ pipeline {
         
         stage('Build') {
             steps {
-                // 빌드 스크립트 실행 (예: Maven, Gradle 등)
-                sh 'echo "Building the project..."'
+                // 빌드 스크립트 실행
+                sh './gradlew build'
             }
         }
         
         stage('Deploy') {
             steps {
                 // 배포 스크립트 실행
-                sh 'echo "Deploying the project..."'
+                sh 'docker-compose up'
             }
         }
     }
