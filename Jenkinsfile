@@ -42,6 +42,7 @@ pipeline {
                 sh 'ls -al'  // 파일 목록 확인
                 dir('./path/to/your/docker-compose') {  // docker-compose.yml 파일이 있는 디렉토리로 이동
                     sh 'docker-compose up -d --build'
+                    sh 'docker images' // 현재 빌드된 이미지 확인
                     sh 'docker-compose logs'  // 로그 확인
                 }
             }
@@ -51,13 +52,16 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('https://registry.hub.docker.com', 'paran-docker') {
-                        def modules = ["gateway", "config", "eureka",
-                                       "user", "group", "chat",
-                                       "file", "room", "comment"]
+                        def modules = ["gateway", "config", "eureka", "user", "group", "chat", "file", "room", "comment"]
 
                         for (module in modules) {
                             def imageTag = "meteoriver/${module}:${env.BUILD_ID}"
-                            sh "docker tag ${module}:latest ${imageTag}" // 태그를 추가
+
+                            // 현재 빌드된 이미지 확인
+                            sh "docker images"
+
+                            // 태그와 푸시
+                            sh "docker tag meteoriver/${module}:latest ${imageTag}" // 태그를 추가
                             sh "docker push ${imageTag}" // 이미지를 푸시
                         }
                     }
@@ -68,9 +72,7 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    def modules = ["gateway-server", "config-server", "eureka-server",
-                                   "user-service", "group-service", "chat-service",
-                                   "file-service", "room-service", "comment-service"]
+                    def modules = ["gateway", "config", "eureka", "user", "group", "chat", "file", "room", "comment"]
 
                     for (module in modules) {
                         sh "kubectl set image deployment/${module} ${module}=meteoriver/${module}:${env.BUILD_ID}"
