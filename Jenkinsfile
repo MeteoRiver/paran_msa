@@ -52,7 +52,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('https://registry.hub.docker.com', 'paran-docker') {
-                        def modules = ["gateway", "config", "eureka", "user", "group", "chat", "file", "room", "comment"]
+                        def modules = ["config", "eureka", "user", "group", "chat", "file", "room", "comment", "gateway"]
 
                         for (module in modules) {
                             def imageTag = "meteoriver/${module}:${env.BUILD_ID}"
