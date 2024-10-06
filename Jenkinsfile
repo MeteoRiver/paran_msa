@@ -56,13 +56,9 @@ pipeline {
                                        "file-service", "room-service", "comment-service"]
 
                         for (module in modules) {
-                            try {
-                                def image = docker.build("meteoriver/${module}:${env.BUILD_ID}", "./${module}")
-                                image.push("latest")
-                                image.push("${env.BUILD_ID}")
-                            } catch (Exception e) {
-                                echo "Error building or pushing image for ${module}: ${e.getMessage()}"
-                            }
+                            def imageTag = "meteoriver/${module}:${env.BUILD_ID}"
+                            sh "docker tag ${module}:latest ${imageTag}" // 태그를 추가
+                            sh "docker push ${imageTag}" // 이미지를 푸시
                         }
                     }
                 }
