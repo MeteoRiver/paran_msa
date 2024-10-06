@@ -40,7 +40,7 @@ pipeline {
             steps {
                 sh 'pwd'  // 현재 작업 디렉토리 확인
                 sh 'ls -al'  // 파일 목록 확인
-                sh 'docker-compose build'
+                sh 'docker-compose -f docker-compose.yml up -d --build'
             }
         }
 
