@@ -57,6 +57,8 @@ pipeline {
                         for (module in modules) {
                             def imageTag = "meteoriver/${module}:${env.BUILD_ID}"
 
+                            sh 'pwd'  // 현재 작업 디렉토리 확인
+                            sh 'ls -al'  // 파일 목록 확인
                             // 현재 빌드된 이미지 확인
                             sh "docker images"
 
