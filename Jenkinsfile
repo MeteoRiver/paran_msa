@@ -51,14 +51,23 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry([url:'https://registry.hub.docker.com', credentialsId:'paran-docker']) {
+                        sh "docker push $meteoriver/paran:config-${env.BUILD_ID}"
+                        sh "docker push $meteoriver/paran:eureka-${env.BUILD_ID}"
+                        sh "docker push $meteoriver/paran:user-${env.BUILD_ID}"
+                        sh "docker push $meteoriver/paran:group-${env.BUILD_ID}"
+                        sh "docker push $meteoriver/paran:chat-${env.BUILD_ID}"
+                        sh "docker push $meteoriver/paran:file-${env.BUILD_ID}"
+                        sh "docker push $meteoriver/paran:room-${env.BUILD_ID}"
+                        sh "docker push $meteoriver/paran:comment-${env.BUILD_ID}"
+                        sh "docker push $meteoriver/paran:gateway-${env.BUILD_ID}"
 
-                        def modules = ["config", "eureka", "user", "group", "chat", "file", "room", "comment", "gateway"]
+/*                         def modules = ["config", "eureka", "user", "group", "chat", "file", "room", "comment", "gateway"]
 
                         for (module in modules) {
                             def imageTag = "meteoriver/paran:${module}-${env.BUILD_ID}"  // 저장소에 푸시할 이미지 태그
                             echo "Tagging and pushing ${imageTag}"  // 디버그 메시지 추가
                             sh "docker push ${imageTag}"  // 이미지를 Docker Hub에 푸시
-                        }
+                        } */
                     }
                 }
             }
