@@ -51,21 +51,19 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 script {
-                    // Docker Hub에 대한 레지스트리 설정
                     withDockerRegistry([url:'https://registry.hub.docker.com', credentialsId:'paran-docker']) {
                         // 로그인된 Docker 계정 확인
                         sh 'cat ~/.docker/config.json | grep "username"'
+                        sh 'docker images'  // 현재 로컬 이미지 목록 확인
 
                         def modules = ["config", "eureka", "user", "group", "chat", "file", "room", "comment", "gateway"]
 
                         for (module in modules) {
                             def imageTag = "meteoriver/paran:${module}-${env.BUILD_ID}"  // 저장소에 푸시할 이미지 태그
+                            echo "Tagging and pushing ${imageTag}"  // 디버그 메시지 추가
 
-                            // 이미지를 태그합니다.
                             sh "docker tag ${imageTag} meteoriver/paran:${module}-${env.BUILD_ID}"
-
-                            // 이미지를 Docker Hub에 푸시합니다.
-                            sh "docker push meteoriver/paran:${module}-${env.BUILD_ID}"
+                            sh "docker push meteoriver/paran:${module}-${env.BUILD_ID}"  // 이미지를 Docker Hub에 푸시
                         }
                     }
                 }
