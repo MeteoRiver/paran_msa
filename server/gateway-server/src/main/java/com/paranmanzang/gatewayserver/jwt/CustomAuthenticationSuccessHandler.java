@@ -56,6 +56,7 @@ public class CustomAuthenticationSuccessHandler {
 
         // Authorization 헤더에 accessToken 추가
         exchange.getResponse().getHeaders().add("Authorization", "Bearer " + access);
+        exchange.getResponse().getHeaders().add("nickname", nickname);
 
         // RefreshToken을 쿠키에 추가
         exchange.getResponse().addCookie(createCookie("refresh", refresh));
