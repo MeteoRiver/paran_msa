@@ -55,22 +55,8 @@ pipeline {
                         def modules = ["config", "eureka", "user", "group", "chat", "file", "room", "comment", "gateway"]
 
                         for (module in modules) {
-                            def imageTag = "meteoriver/paran:${module}-${env.BUILD_ID}"  // 모든 이미지를 paran 저장소에 태그
-
-                            // 이미지 존재 여부 확인
-                            def exists = sh(script: "docker images -q meteoriver/paran:${module}-${env.BUILD_ID}", returnStdout: true).trim()
-                            if (exists) {
-                                // 현재 작업 디렉토리 및 파일 목록 확인
-                                sh 'pwd'
-                                sh 'ls -al'
-                                sh "docker images"  // 현재 빌드된 이미지 확인
-
-                                // 태그와 푸시
-                                sh "docker tag meteoriver/paran:${module}-${env.BUILD_ID} ${imageTag}"  // 각 모듈을 paran 저장소로 태그
-                                sh "docker push ${imageTag}"  // paran 저장소로 푸시
-                            } else {
-                                error "Image meteoriver/paran:${module}-${env.BUILD_ID} not found!"
-                            }
+                            def imageTag = "meteoriver/paran:${module}-${env.BUILD_ID}"  // 저장소에 푸시할 이미지 태그
+                            sh "docker push ${imageTag}"  // 이미지를 Docker Hub에 푸시
                         }
                     }
                 }
