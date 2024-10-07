@@ -51,15 +51,15 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry([url:'https://registry.hub.docker.com', credentialsId:'paran-docker']) {
-                        sh "docker push $meteoriver/paran:config-${env.BUILD_ID}"
-                        sh "docker push $meteoriver/paran:eureka-${env.BUILD_ID}"
-                        sh "docker push $meteoriver/paran:user-${env.BUILD_ID}"
-                        sh "docker push $meteoriver/paran:group-${env.BUILD_ID}"
-                        sh "docker push $meteoriver/paran:chat-${env.BUILD_ID}"
-                        sh "docker push $meteoriver/paran:file-${env.BUILD_ID}"
-                        sh "docker push $meteoriver/paran:room-${env.BUILD_ID}"
-                        sh "docker push $meteoriver/paran:comment-${env.BUILD_ID}"
-                        sh "docker push $meteoriver/paran:gateway-${env.BUILD_ID}"
+                        sh "docker push meteoriver/paran:config-${env.BUILD_ID}"
+                        sh "docker push meteoriver/paran:eureka-${env.BUILD_ID}"
+                        sh "docker push meteoriver/paran:user-${env.BUILD_ID}"
+                        sh "docker push meteoriver/paran:group-${env.BUILD_ID}"
+                        sh "docker push meteoriver/paran:chat-${env.BUILD_ID}"
+                        sh "docker push meteoriver/paran:file-${env.BUILD_ID}"
+                        sh "docker push meteoriver/paran:room-${env.BUILD_ID}"
+                        sh "docker push meteoriver/paran:comment-${env.BUILD_ID}"
+                        sh "docker push meteoriver/paran:gateway-${env.BUILD_ID}"
 
 /*                         def modules = ["config", "eureka", "user", "group", "chat", "file", "room", "comment", "gateway"]
 
