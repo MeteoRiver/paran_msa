@@ -43,7 +43,6 @@ pipeline {
                 dir('./path/to/your/docker-compose') {  // docker-compose.yml 파일이 있는 디렉토리로 이동
                     sh 'docker-compose up -d --build'
                     sh 'docker images' // 현재 빌드된 이미지 확인
-                    sh 'docker-compose logs'  // 로그 확인
                 }
             }
         }
@@ -52,9 +51,6 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry([url:'https://registry.hub.docker.com', credentialsId:'paran-docker']) {
-                        // 로그인된 Docker 계정 확인
-                        sh 'cat ~/.docker/config.json | grep "username"'
-                        sh 'docker images'  // 현재 로컬 이미지 목록 확인
 
                         def modules = ["config", "eureka", "user", "group", "chat", "file", "room", "comment", "gateway"]
 
