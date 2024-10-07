@@ -55,16 +55,15 @@ pipeline {
                         def modules = ["config", "eureka", "user", "group", "chat", "file", "room", "comment", "gateway"]
 
                         for (module in modules) {
-                            def imageTag = "meteoriver/${module}:${env.BUILD_ID}"
+                            def imageTag = "meteoriver/paran:${module}-${env.BUILD_ID}"  // 모든 이미지를 paran 저장소에 태그
 
                             sh 'pwd'  // 현재 작업 디렉토리 확인
                             sh 'ls -al'  // 파일 목록 확인
-                            // 현재 빌드된 이미지 확인
-                            sh "docker images"
+                            sh "docker images"  // 현재 빌드된 이미지 확인
 
                             // 태그와 푸시
-                            sh "docker tag meteoriver/${module}:latest ${imageTag}" // 태그를 추가
-                            sh "docker push ${imageTag}" // 이미지를 푸시
+                            sh "docker tag meteoriver/${module}:latest ${imageTag}"  // 각 모듈을 paran 저장소로 태그
+                            sh "docker push ${imageTag}"  // paran 저장소로 푸시
                         }
                     }
                 }
@@ -77,7 +76,7 @@ pipeline {
                     def modules = ["gateway", "config", "eureka", "user", "group", "chat", "file", "room", "comment"]
 
                     for (module in modules) {
-                        sh "kubectl set image deployment/${module} ${module}=meteoriver/${module}:${env.BUILD_ID}"
+                        sh "kubectl set image deployment/${module} ${module}=meteoriver/paran:${module}-${env.BUILD_ID}"  // paran 저장소에서 이미지 배포
                     }
                 }
             }
