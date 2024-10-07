@@ -55,11 +55,6 @@ pipeline {
                         def modules = ["config", "eureka", "user", "group", "chat", "file", "room", "comment", "gateway"]
 
                         for (module in modules) {
-                            def oldImageTag = "meteoriver/paran:${module}-${env.BUILD_ID - 1}"
-
-                            // 기존 이미지 삭제
-                            sh "docker rmi ${oldImageTag-1} || true"  // 이미지가 존재하지 않을 경우 에러 무시
-
                             def imageTag = "meteoriver/paran:${module}-${env.BUILD_ID}"  // 저장소에 푸시할 이미지 태그
                             sh "docker push ${imageTag}"  // 이미지를 Docker Hub에 푸시
                         }
