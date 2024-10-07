@@ -3,8 +3,8 @@ pipeline {
 
     environment {
         JAVA_HOME = '/opt/java/openjdk'
-        repository = "sue/jenkins"  //docker hub id와 repository 이름
-        DOCKERHUB_CREDENTIALS = credentials('sue-dockerhub') // jenkins에 등록해 놓은 docker hub credentials 이름
+        repository = "meteoriver/paran"  //docker hub id와 repository 이름
+        DOCKERHUB_CREDENTIALS = credentials('paran-docker') // jenkins에 등록해 놓은 docker hub credentials 이름
         dockerImage = ''
     }
 
