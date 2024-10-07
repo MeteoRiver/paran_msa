@@ -3,6 +3,9 @@ pipeline {
 
     environment {
         JAVA_HOME = '/opt/java/openjdk'
+        repository = "sue/jenkins"  //docker hub id와 repository 이름
+        DOCKERHUB_CREDENTIALS = credentials('sue-dockerhub') // jenkins에 등록해 놓은 docker hub credentials 이름
+        dockerImage = ''
     }
 
     stages {
@@ -46,11 +49,15 @@ pipeline {
                 }
             }
         }
-
+        stage('Login'){
+            steps{
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin' // docker hub 로그인
+            }
+        }
         stage('Push to Docker Hub') {
             steps {
                 script {
-                    withDockerRegistry([url:'https://registry.hub.docker.com', credentialsId:'paran-docker']) {
+                    /*withDockerRegistry([url:'https://registry.hub.docker.com', credentialsId:'paran-docker']) {
                         sh "docker push meteoriver/paran:config-${env.BUILD_ID}"
                         sh "docker push meteoriver/paran:eureka-${env.BUILD_ID}"
                         sh "docker push meteoriver/paran:user-${env.BUILD_ID}"
@@ -59,16 +66,16 @@ pipeline {
                         sh "docker push meteoriver/paran:file-${env.BUILD_ID}"
                         sh "docker push meteoriver/paran:room-${env.BUILD_ID}"
                         sh "docker push meteoriver/paran:comment-${env.BUILD_ID}"
-                        sh "docker push meteoriver/paran:gateway-${env.BUILD_ID}"
+                        sh "docker push meteoriver/paran:gateway-${env.BUILD_ID}" */
 
-/*                         def modules = ["config", "eureka", "user", "group", "chat", "file", "room", "comment", "gateway"]
+                         def modules = ["config", "eureka", "user", "group", "chat", "file", "room", "comment", "gateway"]
 
                         for (module in modules) {
                             def imageTag = "meteoriver/paran:${module}-${env.BUILD_ID}"  // 저장소에 푸시할 이미지 태그
                             echo "Tagging and pushing ${imageTag}"  // 디버그 메시지 추가
                             sh "docker push ${imageTag}"  // 이미지를 Docker Hub에 푸시
-                        } */
-                    }
+                        }
+                    //}
                 }
             }
         }
