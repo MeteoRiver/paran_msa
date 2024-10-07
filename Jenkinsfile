@@ -54,7 +54,7 @@ pipeline {
                     // Docker Hub에 대한 레지스트리 설정
                     withDockerRegistry([url:'https://registry.hub.docker.com', credentialsId:'paran-docker']) {
                         // 로그인된 Docker 계정 확인
-                        sh 'docker info | grep Username'
+                        sh 'cat ~/.docker/config.json | grep "username"'
 
                         def modules = ["config", "eureka", "user", "group", "chat", "file", "room", "comment", "gateway"]
 
