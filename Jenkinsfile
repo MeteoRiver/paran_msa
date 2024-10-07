@@ -66,7 +66,7 @@ pipeline {
                                 sh "docker images"  // 현재 빌드된 이미지 확인
 
                                 // 태그와 푸시
-                                sh "docker tag meteoriver/paran:${module} ${imageTag}"  // 각 모듈을 paran 저장소로 태그
+                                sh "docker tag meteoriver/paran:${module}}-${env.BUILD_ID} ${imageTag}"  // 각 모듈을 paran 저장소로 태그
                                 sh "docker push ${imageTag}"  // paran 저장소로 푸시
                             } else {
                                 error "Image meteoriver/paran:${module} not found!"
