@@ -61,9 +61,7 @@ pipeline {
                         for (module in modules) {
                             def imageTag = "meteoriver/paran:${module}-${env.BUILD_ID}"  // 저장소에 푸시할 이미지 태그
                             echo "Tagging and pushing ${imageTag}"  // 디버그 메시지 추가
-
-                            sh "docker tag ${imageTag} meteoriver/paran:${module}-${env.BUILD_ID}"
-                            sh "docker push meteoriver/paran:${module}-${env.BUILD_ID}"  // 이미지를 Docker Hub에 푸시
+                            sh "docker push ${imageTag}"  // 이미지를 Docker Hub에 푸시
                         }
                     }
                 }
