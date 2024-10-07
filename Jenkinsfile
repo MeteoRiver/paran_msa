@@ -9,11 +9,6 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                git branch: 'master', credentialsId: 'paran', url: 'https://github.com/MeteoRiver/paran_msa.git'
-            }
-        }
 
         stage('Build') {
             steps {
@@ -77,6 +72,11 @@ pipeline {
                         }
                     //}
                 }
+            }
+        }
+        stage('Cleaning up') {
+            steps {
+                sh "docker rmi $repository:$BUILD_NUMBER" // docker image 제거
             }
         }
 
