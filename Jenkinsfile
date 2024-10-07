@@ -51,7 +51,7 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 script {
-                    docker.withRegistry('https://registry.hub.docker.com', 'paran-docker') {
+                    docker.withRegistry(url:'https://registry.hub.docker.com',  credentialsId:'paran-docker') {
                         def modules = ["config", "eureka", "user", "group", "chat", "file", "room", "comment", "gateway"]
 
                         for (module in modules) {
