@@ -1,0 +1,42 @@
+server:
+  port: 8083
+
+naver:
+  client-id: Hlz9JqBuVxtAsSSKyWHw
+  client-secret-key: UamL61rm7F
+
+eureka:
+  client:
+    service-url:
+      default-zone: http://eureka:8761/eureka
+
+
+spring:
+  application:
+    name: room-service
+  profiles:
+    active: local
+    config:
+      import: optional:configserver:http://config:8888
+  datasource:
+    url: jdbc:mysql://mysql:3306/parandb  # MySQL 서비스 이름과 포트를 사용
+    username: root                        # MySQL 사용자 이름
+    password: 1234                        # MySQL 비밀번호
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: health,info
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+    hostname: eureka

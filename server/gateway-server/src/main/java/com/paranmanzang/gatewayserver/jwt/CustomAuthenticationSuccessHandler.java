@@ -80,7 +80,7 @@ public class CustomAuthenticationSuccessHandler {
         return ResponseCookie.from(key, value)
                 .maxAge(86400)
                 .path("/")
-                .httpOnly(true)
+                .httpOnly(false)
                 .build();
     }
 }

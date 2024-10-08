@@ -42,6 +42,7 @@ public class CustomSuccessHandler implements ServerAuthenticationSuccessHandler 
         String access = jwtUtil.createAccessJwt(username, role, nickname, 3600000L);
         String refresh = jwtUtil.createRefreshJwt(username, role, nickname, 86400000L);
         response.getHeaders().set("Authorization", "Bearer " + access);
+        response.getHeaders().set("nickname", nickname);
         response.addCookie(createCookie("refresh", refresh));
         jwtTokenService.storeToken(refresh, nickname, 86400000L);
         response.setStatusCode(HttpStatus.OK);
@@ -52,7 +53,7 @@ public class CustomSuccessHandler implements ServerAuthenticationSuccessHandler 
         return ResponseCookie.fromClientResponse(key, value)
                 .maxAge(86400)  // 쿠키의 만료 시간을 초 단위로 설정
                 .path("/")
-                .httpOnly(true)
+                .httpOnly(false)
                 .build();
     }
 }
