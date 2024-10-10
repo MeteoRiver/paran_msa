@@ -33,18 +33,6 @@ pipeline {
             }
         }
 
-        stage('Cleanup') {
-            steps {
-                script {
-                    def containerName = 'f2a88899c679_file'
-                    def containerExists = sh(script: "docker ps -aq -f name=${containerName}", returnStdout: true).trim()
-                    if (containerExists) {
-                        sh "docker rm -f ${containerExists}"
-                    }
-                }
-            }
-        }
-
         stage('Build Docker Images') {
             steps {
                 sh 'pwd'
