@@ -34,14 +34,27 @@ pipeline {
             }
         }
 
+        // 기존 도커 이미지 삭제하는 단계 추가
+        stage('Remove Old Docker Images') {
+            steps {
+                script {
+                    def modules = ["config", "eureka", "user", "group", "chat", "file", "room", "comment", "gateway"]
+
+                    for (module in modules) {
+                        def imageTag = "meteoriver/paran:${module}-${env.BUILD_ID}"  // 기존 이미지 태그 생성
+                        echo "Removing old image: ${imageTag}"  // 디버그 메시지
+                        sh "docker rmi ${imageTag} || true"  // 이미지 삭제 (존재하지 않을 경우 무시)
+                    }
+                }
+            }
+        }
+
         stage('Build Docker Images') {
             steps {
                 sh 'pwd'  // 현재 작업 디렉토리 확인
                 sh 'ls -al'  // 파일 목록 확인
-                dir('./path/to/your/docker-compose') {  // docker-compose.yml 파일이 있는 디렉토리로 이동
-                    sh 'docker-compose up -d --build'
-                    sh 'docker images' // 현재 빌드된 이미지 확인
-                }
+                sh 'docker-compose up -d --build'
+                sh 'docker images' // 현재 빌드된 이미지 확인
             }
         }
         stage('Login'){
