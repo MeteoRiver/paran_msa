@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.net.URI;
 import java.util.Collection;
 
 @Component
@@ -44,6 +45,9 @@ public class CustomSuccessHandler implements ServerAuthenticationSuccessHandler 
         response.getHeaders().set("Authorization", "Bearer " + access);
         response.addCookie(createCookie("refresh", refresh));
         jwtTokenService.storeToken(refresh, nickname, 86400000L);
+
+
+        response.getHeaders().setLocation(URI.create("http://localhost:3000"));
         response.setStatusCode(HttpStatus.OK);
         return response.setComplete();
     }

@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        JAVA_HOME = '/opt/java/openjdk'
+        JAVA_HOME = '/usr/lib/jvm/java-17-openjdk-amd64' ///opt/java/openjdk
         repository = "meteoriver/paran"  //docker hub id와 repository 이름
         DOCKERHUB_CREDENTIALS = credentials('paran-docker') // jenkins에 등록해 놓은 docker hub credentials 이름
         dockerImage = ''
