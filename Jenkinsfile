@@ -1,29 +1,14 @@
 pipeline {
-    environment {
-        JAVA_HOME = '/usr/lib/jvm/java-17-openjdk-amd64/'
-        repository = "cheonghalim/paranmanzang"  // docker hub id와 repository 이름
-        DOCKERHUB_CREDENTIALS = credentials('docker-hub') // jenkins에 등록해 놓은 docker hub credentials 이름
-        KUBECONFIG = "/var/lib/jenkins/.kube/config"
-    }
     agent any
-    stages {
-        stage('Cleanup') {
-            steps {
-                cleanWs()
-            }
-        }
 
+    environment {
+        JAVA_HOME = '/opt/java/openjdk'
+    }
+
+    stages {
         stage('Checkout') {
             steps {
-              checkout([$class: 'GitSCM',
-                  branches: [[name: '*/master']],
-                  userRemoteConfigs: [[
-                      url: 'git@github.com:paranmanzang/paran_msa.git',
-                      credentialsId: 'ssh-key'
-                  ]],
-                  extensions: [[$class: 'SubmoduleOption', recursiveSubmodules: true, parentCredentials: true]]
-              ])
-
+                git branch: 'master', credentialsId: 'paran', url: 'https://github.com/MeteoRiver/paran_msa.git'
             }
         }
 
@@ -33,8 +18,6 @@ pipeline {
                     sh '''#!/bin/bash
                     set -e
                     export JAVA_HOME="$JAVA_HOME"
-
-                    chmod +x ./gradlew
 
                     all_modules=("server:gateway-server" "server:config-server" "server:eureka-server"
                                  "service:user-service" "service:group-service" "service:chat-service"
@@ -46,112 +29,59 @@ pipeline {
                     for module in "${all_modules[@]}"
                     do
                       echo "Building BootJar for $module"
-                      ./gradlew :$module:bootJar --warning-mode all
+                      ./gradlew :$module:bootJar
                     done
                     '''
                 }
             }
         }
-        stage('Login to Docker Hub') {
-            steps {
-                sh '''
-                echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
-                '''
-            }
-        }
+
         stage('Build Docker Images') {
             steps {
-                script {
-                           def modulePaths = [
-                               "config": "/var/lib/jenkins/workspace/paranmanzang/server/config-server",
-                               "eureka": "/var/lib/jenkins/workspace/paranmanzang/server/eureka-server",
-                               "user": "/var/lib/jenkins/workspace/paranmanzang/service/user-service",
-                               "group": "/var/lib/jenkins/workspace/paranmanzang/service/group-service",
-                               "chat": "/var/lib/jenkins/workspace/paranmanzang/service/chat-service",
-                               "file": "/var/lib/jenkins/workspace/paranmanzang/service/file-service",
-                               "room": "/var/lib/jenkins/workspace/paranmanzang/service/room-service",
-                               "comment": "/var/lib/jenkins/workspace/paranmanzang/service/comment-service",
-                               "gateway": "/var/lib/jenkins/workspace/paranmanzang/server/gateway-server"
-                           ]
-
-                           for (module in modulePaths.keySet()) {
-                               echo "Building Docker image for ${module}"
-                               sh """
-                               docker build -t ${repository}:${module} ${modulePaths[module]}
-                               """
-                           }
-               }
+                sh 'pwd'  // 현재 작업 디렉토리 확인
+                sh 'ls -al'  // 파일 목록 확인
+                dir('./path/to/your/docker-compose') {  // docker-compose.yml 파일이 있는 디렉토리로 이동
+                    sh 'docker-compose up -d --build'
+                    sh 'docker images' // 현재 빌드된 이미지 확인
+                    sh 'docker-compose logs'  // 로그 확인
+                }
             }
         }
 
         stage('Push to Docker Hub') {
             steps {
-            script {
-                                def modulePaths = [
-                                    "config": "/var/lib/jenkins/workspace/paranmanzang/server/config-server",
-                                    "eureka": "/var/lib/jenkins/workspace/paranmanzang/server/eureka-server",
-                                    "user": "/var/lib/jenkins/workspace/paranmanzang/service/user-service",
-                                    "group": "/var/lib/jenkins/workspace/paranmanzang/service/group-service",
-                                    "chat": "/var/lib/jenkins/workspace/paranmanzang/service/chat-service",
-                                    "file": "/var/lib/jenkins/workspace/paranmanzang/service/file-service",
-                                    "room": "/var/lib/jenkins/workspace/paranmanzang/service/room-service",
-                                    "comment": "/var/lib/jenkins/workspace/paranmanzang/service/comment-service",
-                                    "gateway": "/var/lib/jenkins/workspace/paranmanzang/server/gateway-server"
-                                ]
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', 'paran-docker') {
+                        def modules = ["config", "eureka", "user", "group", "chat", "file", "room", "comment", "gateway"]
 
-                                // 각 모듈에 대해 Docker 이미지 태그 및 푸시
-                                for (module in modulePaths.keySet()) {
-                                    def imageTag = "${repository}:${module}"  // BUILD_ID로 고유한 태그 설정
-                                    echo "Tagging and pushing Docker image for ${module} with tag ${env.BUILD_ID}"
-                                    sh """
-                                    docker tag ${repository}:${module} ${imageTag}
-                                    docker push ${imageTag}
-                                    """
-                                }
-                            }
+                        for (module in modules) {
+                            def imageTag = "meteoriver/${module}:${env.BUILD_ID}"
+
+                            sh 'pwd'  // 현재 작업 디렉토리 확인
+                            sh 'ls -al'  // 파일 목록 확인
+                            // 현재 빌드된 이미지 확인
+                            sh "docker images"
+
+                            // 태그와 푸시
+                            sh "docker tag meteoriver/${module}:latest ${imageTag}" // 태그를 추가
+                            sh "docker push ${imageTag}" // 이미지를 푸시
+                        }
+                    }
+                }
             }
         }
 
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    def modules = ["gateway", "config", "eureka", "user", "group", "chat", "file", "room", "comment"]
 
-       stage('Deploy to Kubernetes') {
-           steps {
-               script {
-                   def modulePaths = [
-                       "gateway": "/var/lib/jenkins/workspace/paranmanzang/server/gateway-server/gateway.yaml",
-                       "config": "/var/lib/jenkins/workspace/paranmanzang/server/config-server/config.yaml",
-                       "eureka": "/var/lib/jenkins/workspace/paranmanzang/server/eureka-server/eureka.yaml",
-                       "user": "/var/lib/jenkins/workspace/paranmanzang/service/user-service/user.yaml",
-                       "group": "/var/lib/jenkins/workspace/paranmanzang/service/group-service/group.yaml",
-                       "chat": "/var/lib/jenkins/workspace/paranmanzang/service/chat-service/chat.yaml",
-                       "file": "/var/lib/jenkins/workspace/paranmanzang/service/file-service/file.yaml",
-                       "room": "/var/lib/jenkins/workspace/paranmanzang/service/room-service/room.yaml",
-                       "comment": "/var/lib/jenkins/workspace/paranmanzang/service/comment-service/comment.yaml"
-                   ]
-
-                   for (module in modulePaths.keySet()) {
-                       def yamlPath = modulePaths[module]
-                       echo "Applying Kubernetes deployment for ${module} using YAML file: ${yamlPath}"
-
-                       // YAML 파일을 사용하여 배포 적용
-                       sh """
-                       kubectl apply -f ${yamlPath}
-                       """
-
-                       // YAML 파일에서 정의된 실제 배포 이름을 사용하여 롤아웃 상태 확인
-                       // 예: 배포 이름이 module 이름과 동일하다고 가정
-                       def deploymentName = module
-                       echo "Checking rollout status for deployment ${deploymentName}"
-
-                       // 배포 롤아웃 상태 확인
-                       sh """
-                       kubectl rollout status deployment/${deploymentName}
-                       """
-                   }
-               }
-           }
-       }
-
-
+                    for (module in modules) {
+                        sh "kubectl set image deployment/${module} ${module}=meteoriver/${module}:${env.BUILD_ID}"
+                    }
+                }
+            }
+        }
     }
 
     post {
